@@ -6,9 +6,13 @@ import (
 )
 
 func main() {
-	engin := gin.Default()
+	engine := gin.Default()
 	
-	engin.GET("/", handlers.HelloWorldGin)
+	// this is an init router for gin
+	engine.GET("/", handlers.HelloWorldGin)
 	
-	engin.Run("localhost:8000")
+	// routers for Recipe
+	engine.POST("/recipes", handlers.NewRecipeHandler)
+	
+	engine.Run("localhost:8000")
 }
