@@ -18,6 +18,7 @@ func main() {
 		recipes.GET("/", handlers.ListRecipesHandler)
 		recipes.PUT("/:id", handlers.UpdateRecipeHandler)
 		recipes.DELETE("/:id", handlers.DeleteRecipeHandler)
+		recipes.GET("/search", handlers.SearchRecipeHandler)
 	}
 	
 	engine.Run("localhost:8000")
