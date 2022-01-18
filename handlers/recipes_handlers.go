@@ -61,3 +61,19 @@ func UpdateRecipeHandler(c *gin.Context) {
 		"error": "Recipe not found",
 	})
 }
+
+func DeleteRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	for i := range recipes {
+		if id == recipes[i].ID {
+			c.JSON(http.StatusOK, gin.H{
+				"message": recipes[i].Name + " recipe has been deleted",
+			})
+			recipes = append(recipes[:i], recipes[i+1:]...)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{
+		"Error": "Recipe not found",
+	})
+}
