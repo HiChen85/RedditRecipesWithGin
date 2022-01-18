@@ -14,6 +14,7 @@ func main() {
 	// routers for Recipe
 	engine.POST("/recipes", handlers.NewRecipeHandler)
 	engine.GET("/recipes", handlers.ListRecipesHandler)
+	engine.PUT("/recipes/:id", handlers.UpdateRecipeHandler)
 	
 	engine.Run("localhost:8000")
 }
