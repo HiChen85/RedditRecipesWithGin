@@ -2,17 +2,20 @@ package handlers
 
 import (
 	"github.com/HiChen85/RedditRecipesWithGin/models"
+	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 	"net/http"
+	"os"
 	"time"
 )
 
 var recipes []*models.Recipe
 
 func init() {
-	recipes = make([]*models.Recipe, 0)
-	
+	//recipes = make([]*models.Recipe, 0)
+	path, _ := os.Getwd()
+	recipes = utils.LoadRecipesJson(path + "/recipes.json")
 }
 
 func NewRecipeHandler(c *gin.Context) {
@@ -27,4 +30,8 @@ func NewRecipeHandler(c *gin.Context) {
 	recipe.PublishAt = time.Now()
 	recipes = append(recipes, &recipe)
 	c.JSON(http.StatusOK, recipe)
+}
+
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
 }
