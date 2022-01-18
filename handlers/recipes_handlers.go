@@ -35,3 +35,29 @@ func NewRecipeHandler(c *gin.Context) {
 func ListRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
+
+func UpdateRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	var recipe models.Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	for i := range recipes {
+		if recipes[i].ID == id {
+			recipe.ID = recipes[i].ID
+			recipe.PublishAt = recipes[i].PublishAt
+			recipes[i] = &recipe
+			c.JSON(http.StatusOK, gin.H{
+				"message": "OK",
+				"updated": recipe,
+			})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "Recipe not found",
+	})
+}
