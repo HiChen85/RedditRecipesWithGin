@@ -12,9 +12,13 @@ func main() {
 	engine.GET("/", handlers.HelloWorldGin)
 	
 	// routers for Recipe
-	engine.POST("/recipes", handlers.NewRecipeHandler)
-	engine.GET("/recipes", handlers.ListRecipesHandler)
-	engine.PUT("/recipes/:id", handlers.UpdateRecipeHandler)
+	recipes := engine.Group("/recipes")
+	{
+		recipes.POST("/", handlers.NewRecipeHandler)
+		recipes.GET("/", handlers.ListRecipesHandler)
+		recipes.PUT("/:id", handlers.UpdateRecipeHandler)
+		recipes.DELETE("/:id", handlers.DeleteRecipeHandler)
+	}
 	
 	engine.Run("localhost:8000")
 }
