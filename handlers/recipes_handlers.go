@@ -77,3 +77,24 @@ func DeleteRecipeHandler(c *gin.Context) {
 		"Error": "Recipe not found",
 	})
 }
+
+func SearchRecipeHandler(c *gin.Context) {
+	tag := c.Query("tag")
+	tempRecipes := make([]*models.Recipe, 0)
+	for i := range recipes {
+		tags := recipes[i].Tags
+		for j := range tags {
+			if tags[j] == tag {
+				tempRecipes = append(tempRecipes, recipes[i])
+				break
+			}
+		}
+	}
+	if len(tempRecipes) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "No recipe related to " + tag + " is found ",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, tempRecipes)
+}
