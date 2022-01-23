@@ -1,9 +1,31 @@
 package main
 
 import (
+	"context"
 	"github.com/HiChen85/RedditRecipesWithGin/handlers"
+	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 )
+
+var recipeHandler *handlers.RecipeHandler
+
+func init() {
+	ctx := context.Background()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(utils.MONGO_URI))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = client.Ping(ctx, readpref.Primary()); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Connected to MongoDB......")
+	collection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_COLLECTION)
+	recipeHandler = handlers.NewRecipeHandler(collection, ctx)
+}
 
 func main() {
 	engine := gin.Default()
@@ -11,14 +33,15 @@ func main() {
 	// this is an init router for gin
 	engine.GET("/", handlers.HelloWorldGin)
 	
-	// routers for Recipe
+	// routers group for Recipe
 	recipes := engine.Group("/recipes")
 	{
-		recipes.POST("/", handlers.NewRecipeHandler)
-		recipes.GET("/", handlers.ListRecipesHandler)
-		recipes.PUT("/:id", handlers.UpdateRecipeHandler)
-		recipes.DELETE("/:id", handlers.DeleteRecipeHandler)
-		recipes.GET("/search", handlers.SearchRecipeHandler)
+		recipes.POST("/", recipeHandler.PostNewRecipeHandler)
+		recipes.GET("/", recipeHandler.ListRecipesHandler)
+		recipes.PUT("/:id", recipeHandler.UpdateRecipeHandler)
+		recipes.DELETE("/:id", recipeHandler.DeleteRecipeHandler)
+		recipes.GET("/search", recipeHandler.SearchRecipeHandler)
+		recipes.GET("/:id", recipeHandler.GetOneRecipeHandler)
 	}
 	
 	engine.Run("localhost:8000")
