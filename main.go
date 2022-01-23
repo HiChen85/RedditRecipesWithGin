@@ -5,6 +5,7 @@ import (
 	"github.com/HiChen85/RedditRecipesWithGin/handlers"
 	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -23,8 +24,11 @@ func init() {
 		log.Fatal(err)
 	}
 	log.Println("Connected to MongoDB......")
-	collection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_COLLECTION)
-	recipeHandler = handlers.NewRecipeHandler(collection, ctx)
+	mongoCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_COLLECTION)
+	redisClient := redis.NewClient(&utils.RedisOptions)
+	status := redisClient.Ping(ctx)
+	log.Println("Redis status:", status)
+	recipeHandler = handlers.NewRecipeHandler(ctx, mongoCollection, redisClient)
 }
 
 func main() {
