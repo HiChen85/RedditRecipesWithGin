@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/go-redis/redis/v8"
 )
 
 var (
@@ -14,3 +15,17 @@ var (
 )
 
 var MONGO_URI = fmt.Sprintf("mongodb://%v:%v@%v:%v/%v?authSource=%v", MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, MONGO_DATABASE, MONGO_USERNAME)
+
+// Redis connection config
+var (
+	REDIS_HOST     = "localhost"
+	REDIS_PORT     = "6379"
+	REDIS_PASSWORD = ""
+	REDIS_DB       = 0
+)
+
+var RedisOptions = redis.Options{
+	Addr:     REDIS_HOST + ":" + REDIS_PORT,
+	Password: REDIS_PASSWORD,
+	DB:       REDIS_DB,
+}
