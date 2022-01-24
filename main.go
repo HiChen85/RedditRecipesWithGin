@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/HiChen85/RedditRecipesWithGin/handlers"
+	"github.com/HiChen85/RedditRecipesWithGin/handlers/middlewares"
 	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -12,6 +13,7 @@ import (
 	"log"
 )
 
+var authHandler *handlers.AuthHandler
 var recipeHandler *handlers.RecipeHandler
 
 func init() {
@@ -24,11 +26,17 @@ func init() {
 		log.Fatal(err)
 	}
 	log.Println("Connected to MongoDB......")
-	mongoCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_COLLECTION)
+	// create mongodb recipes collection
+	recipesCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_RECIPES_COLLECTION)
+	authCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_USER_COLLECTION)
+	// New Redis Client
 	redisClient := redis.NewClient(&utils.RedisOptions)
 	status := redisClient.Ping(ctx)
 	log.Println("Redis status:", status)
-	recipeHandler = handlers.NewRecipeHandler(ctx, mongoCollection, redisClient)
+	// recipeHandler
+	recipeHandler = handlers.NewRecipeHandler(ctx, recipesCollection, redisClient)
+	// authHandler
+	authHandler = handlers.NewAuthHandler(ctx, authCollection, redisClient)
 }
 
 func main() {
@@ -36,16 +44,20 @@ func main() {
 	
 	// this is an init router for gin
 	engine.GET("/", handlers.HelloWorldGin)
+	engine.POST("/signin", authHandler.SignInHandler)
+	engine.POST("/refresh", authHandler.RefreshTokenHandler)
 	
 	// routers group for Recipe
 	recipes := engine.Group("/recipes")
+	// 使用认证中间件来进行用户验证.
+	recipes.Use(middlewares.AuthMiddleware())
 	{
-		recipes.POST("/", recipeHandler.PostNewRecipeHandler)
 		recipes.GET("/", recipeHandler.ListRecipesHandler)
+		recipes.POST("/", recipeHandler.PostNewRecipeHandler)
 		recipes.PUT("/:id", recipeHandler.UpdateRecipeHandler)
+		recipes.GET("/:id", recipeHandler.GetOneRecipeHandler)
 		recipes.DELETE("/:id", recipeHandler.DeleteRecipeHandler)
 		recipes.GET("/search", recipeHandler.SearchRecipeHandler)
-		recipes.GET("/:id", recipeHandler.GetOneRecipeHandler)
 	}
 	
 	engine.Run("localhost:8000")
