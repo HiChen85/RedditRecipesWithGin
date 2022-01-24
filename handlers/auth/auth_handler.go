@@ -1,4 +1,4 @@
-package handlers
+package auth
 
 import (
 	"context"
@@ -47,8 +47,8 @@ func (a *AuthHandler) SignInHandler(c *gin.Context) {
 		})
 		return
 	}
-	// 当验证通过, 为用户生成一个 token
-	expirationTime := time.Now().Add(1 * time.Minute)
+	// 当验证通过, 为用户生成一个 token, 过期时间为当前时间 + 几分钟
+	expirationTime := time.Now().Add(3 * time.Minute)
 	// 定义一个标准的 payload 中的部分字段
 	claims := jwt.StandardClaims{
 		ExpiresAt: expirationTime.Unix(),
