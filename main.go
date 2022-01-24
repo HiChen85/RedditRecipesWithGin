@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/HiChen85/RedditRecipesWithGin/handlers"
-	"github.com/HiChen85/RedditRecipesWithGin/handlers/middlewares"
+	"github.com/HiChen85/RedditRecipesWithGin/handlers/auth"
 	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -13,7 +13,7 @@ import (
 	"log"
 )
 
-var authHandler *handlers.AuthHandler
+var authHandler *auth.AuthHandler
 var recipeHandler *handlers.RecipeHandler
 
 func init() {
@@ -36,7 +36,7 @@ func init() {
 	// recipeHandler
 	recipeHandler = handlers.NewRecipeHandler(ctx, recipesCollection, redisClient)
 	// authHandler
-	authHandler = handlers.NewAuthHandler(ctx, authCollection, redisClient)
+	authHandler = auth.NewAuthHandler(ctx, authCollection, redisClient)
 }
 
 func main() {
@@ -45,12 +45,14 @@ func main() {
 	// this is an init router for gin
 	engine.GET("/", handlers.HelloWorldGin)
 	engine.POST("/signin", authHandler.SignInHandler)
+	engine.POST("/signup", authHandler.SignUpHandler)
 	engine.POST("/refresh", authHandler.RefreshTokenHandler)
+	engine.POST("/signout", authHandler.SignOutHandler)
 	
 	// routers group for Recipe
 	recipes := engine.Group("/recipes")
 	// 使用认证中间件来进行用户验证.
-	recipes.Use(middlewares.AuthMiddleware())
+	recipes.Use(authHandler.AuthMiddleware())
 	{
 		recipes.GET("/", recipeHandler.ListRecipesHandler)
 		recipes.POST("/", recipeHandler.PostNewRecipeHandler)
