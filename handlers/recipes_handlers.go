@@ -52,8 +52,8 @@ func (r *RecipeHandler) PostNewRecipeHandler(c *gin.Context) {
 		log.Println("Delete cache from Redis...")
 		r.redisClient.Del(r.ctx, "recipes")
 	} else if err != nil { // 保证程序的健壮性
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		// 当更新后获取不到缓存时,应该在后台显示没有缓存
+		log.Println(err.Error())
 	}
 	c.JSON(http.StatusOK, recipe)
 }
@@ -142,8 +142,8 @@ func (r *RecipeHandler) UpdateRecipeHandler(c *gin.Context) {
 		log.Println("Delete cache from Redis")
 		r.redisClient.Del(r.ctx, "recipes")
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		// 当更新后获取不到缓存时,应该在后台显示没有缓存
+		log.Println(err.Error())
 	}
 	c.JSON(http.StatusOK, recipe)
 }
@@ -172,8 +172,8 @@ func (r *RecipeHandler) DeleteRecipeHandler(c *gin.Context) {
 		log.Println("Delete cache from Redis")
 		r.redisClient.Del(r.ctx, "recipes")
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		// 当更新后获取不到缓存时,应该在后台显示没有缓存
+		log.Println(err.Error())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully delete document",
