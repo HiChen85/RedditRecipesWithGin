@@ -47,15 +47,15 @@ func (r *RecipeHandler) PostNewRecipeHandler(c *gin.Context) {
 	}
 	log.Println("Successfully insert one to MongoDB...")
 	
-	_, err = r.redisClient.Get(r.ctx, "recipes").Result()
-	if err != redis.Nil {
-		log.Println("Delete cache from Redis...")
-		r.redisClient.Del(r.ctx, "recipes")
-	} else if err != nil { // 保证程序的健壮性
-		// 当更新后获取不到缓存时,应该在后台显示没有缓存
-		log.Println(err.Error())
+	result, err := r.redisClient.Exists(r.ctx, "recipes", "recipesWithTags").Result()
+	if result != 0 {
+		log.Println("Delete caches")
+		r.redisClient.Del(r.ctx, "recipes", "recipesWithTags")
 	}
-	c.JSON(http.StatusOK, recipe)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Insert successfully",
+		"data":    recipe,
+	})
 }
 
 func (r *RecipeHandler) ListRecipesHandler(c *gin.Context) {
@@ -137,13 +137,10 @@ func (r *RecipeHandler) UpdateRecipeHandler(c *gin.Context) {
 		})
 	}
 	log.Println("successfully Update...")
-	_, err = r.redisClient.Get(r.ctx, "recipes").Result()
-	if err != redis.Nil {
-		log.Println("Delete cache from Redis")
-		r.redisClient.Del(r.ctx, "recipes")
-	} else if err != nil {
-		// 当更新后获取不到缓存时,应该在后台显示没有缓存
-		log.Println(err.Error())
+	result, err := r.redisClient.Exists(r.ctx, "recipes", "recipesWithTags").Result()
+	if result != 0 {
+		log.Println("Delete caches")
+		r.redisClient.Del(r.ctx, "recipes", "recipesWithTags")
 	}
 	c.JSON(http.StatusOK, recipe)
 }
@@ -167,13 +164,10 @@ func (r *RecipeHandler) DeleteRecipeHandler(c *gin.Context) {
 		return
 	}
 	log.Println("Successfully delete")
-	_, err = r.redisClient.Get(r.ctx, "recipes").Result()
-	if err != redis.Nil {
-		log.Println("Delete cache from Redis")
-		r.redisClient.Del(r.ctx, "recipes")
-	} else if err != nil {
-		// 当更新后获取不到缓存时,应该在后台显示没有缓存
-		log.Println(err.Error())
+	result, err := r.redisClient.Exists(r.ctx, "recipes", "recipesWithTags").Result()
+	if result != 0 {
+		log.Println("Delete caches")
+		r.redisClient.Del(r.ctx, "recipes", "recipesWithTags")
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully delete document",
