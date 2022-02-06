@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"embed"
-	"github.com/HiChen85/RedditRecipesWithGin/handlers"
-	"github.com/HiChen85/RedditRecipesWithGin/handlers/auth"
+	handlers2 "github.com/HiChen85/RedditRecipesWithGin/recipes_service/handlers"
+	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/handlers/auth"
 	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ import (
 var FS embed.FS
 
 var authHandler *auth.AuthHandler
-var recipeHandler *handlers.RecipeHandler
+var recipeHandler *handlers2.RecipeHandler
 
 func init() {
 	ctx := context.Background()
@@ -37,13 +37,15 @@ func init() {
 	log.Println("Connected to MongoDB......")
 	// create mongodb recipes collection
 	recipesCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_RECIPES_COLLECTION)
+	// Create User Collection
 	authCollection := client.Database(utils.MONGO_DATABASE).Collection(utils.MONGO_USER_COLLECTION)
 	// New Redis Client
 	redisClient := redis.NewClient(&utils.RedisOptions)
+	// test if the redis works well or not.
 	status := redisClient.Ping(ctx)
 	log.Println("Redis status:", status)
 	// recipeHandler
-	recipeHandler = handlers.NewRecipeHandler(ctx, recipesCollection, redisClient)
+	recipeHandler = handlers2.NewRecipeHandler(ctx, recipesCollection, redisClient)
 	// authHandler
 	authHandler = auth.NewAuthHandler(ctx, authCollection, redisClient)
 }
@@ -75,7 +77,7 @@ func main() {
 	engine.StaticFS("/assets", http.FS(fsAssets))
 	
 	// this is an init router for gin
-	engine.GET("/", handlers.HelloWorldGin)
+	engine.GET("/", handlers2.HelloWorldGin)
 	engine.POST("/signin", authHandler.SignInHandler)
 	engine.POST("/signup", authHandler.SignUpHandler)
 	engine.POST("/refresh", authHandler.RefreshTokenHandler)

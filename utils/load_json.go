@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/HiChen85/RedditRecipesWithGin/models"
+	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/models"
 	"io/ioutil"
 	"log"
 )
