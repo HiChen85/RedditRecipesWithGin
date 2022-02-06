@@ -175,9 +175,11 @@ func (r *RecipeHandler) DeleteRecipeHandler(c *gin.Context) {
 }
 
 func (r *RecipeHandler) SearchRecipeHandler(c *gin.Context) {
-	val, err := r.redisClient.Get(r.ctx, "recipesWithTags").Result()
+	tag := c.Query("tag")
+	key := "recipesWith" + tag
+	val, err := r.redisClient.Get(r.ctx, key).Result()
 	if err == redis.Nil {
-		tag := c.Query("tag")
+		log.Println("Request to MongoDB")
 		tempRecipes := make([]*models.Recipe, 0)
 		// 使用 bson.M 作为过滤器, 当进行 in 查询时, 先设置好要查询的字段, 然后重新设置一个 bson.M 设置 in 参数
 		// 在设定好对应字段中匹配的值
@@ -197,7 +199,7 @@ func (r *RecipeHandler) SearchRecipeHandler(c *gin.Context) {
 		}
 		// 因为 redis 中存入的是 string类型,所以必须先将 go 的结构体对象转为 byte 数组,再转为 string
 		cacheData, _ := json.Marshal(tempRecipes)
-		r.redisClient.Set(r.ctx, "recipesWithTags", string(cacheData), 0)
+		r.redisClient.Set(r.ctx, key, string(cacheData), 0)
 		c.JSON(http.StatusOK, tempRecipes)
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
