@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"github.com/HiChen85/RedditRecipesWithGin/models"
+	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson"

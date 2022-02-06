@@ -2,7 +2,7 @@ package auth
 
 import (
 	"crypto/sha256"
-	"github.com/HiChen85/RedditRecipesWithGin/models"
+	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
