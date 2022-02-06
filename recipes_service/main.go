@@ -64,7 +64,7 @@ func main() {
 	
 	// 定义 cors 中间件
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:63342"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:63343"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
