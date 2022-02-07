@@ -14,6 +14,7 @@ var (
 	MONGO_RECIPES_COLLECTION    = "recipes"
 	MONGO_USER_COLLECTION       = "users"
 	MONGO_RSS_PARSER_COLLECTION = "parseRecipes"
+	MONGO_CONSUMER_COLLECTION   = "consumerRecipes"
 )
 
 var MONGO_URI = fmt.Sprintf("mongodb://%v:%v@%v:%v/%v?authSource=%v", MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, MONGO_DATABASE, MONGO_USERNAME)
