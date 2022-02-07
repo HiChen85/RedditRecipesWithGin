@@ -1,15 +1,31 @@
-package handlers
+package utils
 
 import (
 	"encoding/xml"
 	"github.com/HiChen85/RedditRecipesWithGin/rss_parser/client_proxy"
-	"github.com/HiChen85/RedditRecipesWithGin/rss_parser/models"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-func GetDataFromReddit(url string) ([]models.Entry, error) {
+type Feed struct {
+	Entries []Entry `xml:"entry"`
+}
+
+// 因为.rss 网站返回的是xml 数据,所以需要使用 xml 标签而非 json
+type Entry struct {
+	// recipe 地址
+	Link struct {
+		Href string `xml:"href,attr"`
+	} `xml:"link"`
+	// 此处的 URL 是食谱的配图地址
+	Thumbnail struct {
+		URL string `xml:"url,attr"`
+	} `xml:"thumbnail"`
+	Title string `xml:"title"`
+}
+
+func GetDataFromReddit(url string) ([]Entry, error) {
 	// 创建请求客户端
 	reqClient := client_proxy.NewReqClient()
 	
@@ -33,7 +49,7 @@ func GetDataFromReddit(url string) ([]models.Entry, error) {
 		log.Println(err)
 		return nil, err
 	}
-	var feed models.Feed
+	var feed Feed
 	err = xml.Unmarshal(dataBytes, &feed)
 	if err != nil {
 		log.Println(err)

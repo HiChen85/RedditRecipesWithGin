@@ -45,7 +45,7 @@ func ParseHandler(c *gin.Context) {
 		return
 	}
 	// 成功解析到上传的 JSON 数据后调用获取数据的方法, 从reddit 中获取数据
-	entries, err := GetDataFromReddit(jsonData.URL)
+	entries, err := utils.GetDataFromReddit(jsonData.URL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "无法获取数据" + err.Error(),
