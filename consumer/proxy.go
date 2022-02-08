@@ -1,4 +1,4 @@
-package client_proxy
+package main
 
 import (
 	"crypto/tls"
