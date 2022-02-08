@@ -1,8 +1,7 @@
-package utils
+package main
 
 import (
 	"encoding/xml"
-	"github.com/HiChen85/RedditRecipesWithGin/consumer/utils/client_proxy"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -27,7 +26,7 @@ type Entry struct {
 
 func GetDataFromReddit(url string) ([]Entry, error) {
 	// 创建请求客户端
-	reqClient := client_proxy.NewReqClient()
+	reqClient := NewReqClient()
 	
 	// 创建请求
 	req, err := http.NewRequest("GET", url, nil)
