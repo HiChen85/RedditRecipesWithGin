@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <section class="container">
+        <div class="row">
+            <ul class="list-group">
+                {{ range .recipes }}
+                <li class="list-group-item">
+                    <div style="width: 100%">
+                        <img src="{{ .Thumbnail }}" class="card-img-top thumbnail" alt="thumbnail">
+                        <span class="title" >{{ .Title }}</span>
+                        <a href="{{ .Link }}" target="_blank" class="btn btn-primary btn-sm see_recipe"> See recipe</a>
+                    </div>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

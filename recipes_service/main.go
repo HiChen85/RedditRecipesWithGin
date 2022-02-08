@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"embed"
-	handlers2 "github.com/HiChen85/RedditRecipesWithGin/recipes_service/handlers"
+	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/handlers"
 	"github.com/HiChen85/RedditRecipesWithGin/recipes_service/handlers/auth"
 	"github.com/HiChen85/RedditRecipesWithGin/utils"
 	"github.com/gin-contrib/cors"
@@ -23,7 +23,7 @@ import (
 var FS embed.FS
 
 var authHandler *auth.AuthHandler
-var recipeHandler *handlers2.RecipeHandler
+var recipeHandler *handlers.RecipeHandler
 
 func init() {
 	ctx := context.Background()
@@ -45,7 +45,7 @@ func init() {
 	status := redisClient.Ping(ctx)
 	log.Println("Redis status:", status)
 	// recipeHandler
-	recipeHandler = handlers2.NewRecipeHandler(ctx, recipesCollection, redisClient)
+	recipeHandler = handlers.NewRecipeHandler(ctx, recipesCollection, redisClient)
 	// authHandler
 	authHandler = auth.NewAuthHandler(ctx, authCollection, redisClient)
 }
@@ -77,12 +77,15 @@ func main() {
 	engine.StaticFS("/assets", http.FS(fsAssets))
 	
 	// this is an init router for gin
-	engine.GET("/", handlers2.HelloWorldGin)
+	engine.GET("/", handlers.HelloWorldGin)
 	engine.POST("/signin", authHandler.SignInHandler)
 	engine.POST("/signup", authHandler.SignUpHandler)
 	engine.POST("/refresh", authHandler.RefreshTokenHandler)
 	engine.POST("/signout", authHandler.SignOutHandler)
+	
+	// Public  API for users
 	engine.GET("/recipes", recipeHandler.ListRecipesHandler)
+	engine.GET("/dashboard", handlers.DashboardHandler)
 	
 	// routers group for Recipe
 	recipes := engine.Group("/recipes")
