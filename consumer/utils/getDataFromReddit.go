@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/xml"
-	"github.com/HiChen85/RedditRecipesWithGin/utils/client_proxy"
+	"github.com/HiChen85/RedditRecipesWithGin/consumer/utils/client_proxy"
 	"io/ioutil"
 	"log"
 	"net/http"
