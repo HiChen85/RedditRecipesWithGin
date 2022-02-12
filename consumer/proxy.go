@@ -3,16 +3,15 @@ package main
 import (
 	"crypto/tls"
 	"net/http"
-	"net/url"
 	"sync"
 )
 
 // NewReqClient 使用单例模式创建一个请求客户端,向 reddit 发送请求, 由于 reddit 的外网环境,需要使用本机代理
 func NewReqClient() *http.Client {
-	var ProxyURI, _ = url.Parse("http://127.0.0.1:41091")
+	//var ProxyURI, _ = url.Parse("http://localhost:41091")
 	
 	var transport = &http.Transport{
-		Proxy:           http.ProxyURL(ProxyURI),
+		//Proxy:           http.ProxyURL(ProxyURI),
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	
