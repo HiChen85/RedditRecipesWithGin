@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"os"
 )
 
 type Request struct {
@@ -21,7 +22,7 @@ var ctx context.Context
 
 func init() {
 	ctx = context.Background()
-	tempClient, err := mongo.Connect(ctx, options.Client().ApplyURI(MONGO_URI))
+	tempClient, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -35,7 +36,7 @@ func init() {
 func main() {
 	
 	// 一个消费者程序, 在消费完消息之后应自动关闭与消息队列的链接
-	amqpConn, err := amqp.Dial(RABBITMQ_URI)
+	amqpConn, err := amqp.Dial(os.Getenv("RABBITMQ_URI"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -47,7 +48,7 @@ func main() {
 	
 	forever := make(chan bool)
 	// 获取消息的过程
-	msg, err := channelAmqp.Consume(RABBITMQ_QUEUE, "", true, false, false, false, nil)
+	msg, err := channelAmqp.Consume(os.Getenv("RABBITMQ_QUEUE"), "", true, false, false, false, nil)
 	
 	// 另起一个 go routine 来让消费者轮询消息队列
 	go func() {
@@ -57,7 +58,7 @@ func main() {
 			json.Unmarshal(deliver.Body, &req)
 			// 现在消费者程序需要根据这个 URL 去获取数据并存储
 			entries, _ := GetDataFromReddit(req.URL)
-			recipeCollection := mongoClient.Database(MONGO_DATABASE).Collection(MONGO_CONSUMER_COLLECTION)
+			recipeCollection := mongoClient.Database(os.Getenv("MONGO_DATABASE")).Collection(os.Getenv("MONGO_CONSUMER_COLLECTION"))
 			// 头两个数据不要
 			for i := range entries[2:] {
 				_, err := recipeCollection.InsertOne(ctx, bson.M{
